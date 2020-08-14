@@ -1,0 +1,88 @@
+%Every document starts with a documentclass. 
+\documentclass[11pt]{article}
+
+%After that, it's useful to list an author and give a title.
+\author{Wassim Marrakchi}
+\date{Wednesday, May 2, 2018} 
+\title{CS51 : Final Project}
+
+%Graphicx is used to include pictures in LaTeX files. 
+\usepackage{graphicx}
+
+%This package changes the margins (makes them smaller than the default). 
+\usepackage[margin=1in]{geometry}
+
+%The below command makes sure that every section starts on a new page. That way if you have a new section for every CA, they'll all print out on separate pieces of paper. 
+\usepackage{titlesec}
+\usepackage{indentfirst}
+%The AMS packages. They contain a lot of useful math-related goodies.
+\usepackage{amsthm}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{upgreek}
+
+
+%This package changes the margins (makes them smaller than the default). 
+\usepackage[margin=1in]{geometry}
+
+%This package gives flexibility to use lettered lists in addition to numbered lists
+\usepackage[shortlabels]{enumitem}
+
+%The below command makes sure that every section starts on a new page. That way if you have a new section for every CA, they'll all print out on separate pieces of paper. 
+\usepackage{titlesec}
+
+%The amsthm package lets you format different types of mathematical ideas nicely. You use it by defining "\newtheorem"s as below:
+\newtheorem{problem}{Problem}
+\newtheorem{theorem}{Theorem}
+\newtheorem*{proposition}{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{defn}[theorem]{Definition}
+\renewcommand*{\proofname}{Solution} %This command changes "Proof" to "Solution" in the proof environment. 
+
+%The "\newcommand" command lets you specify a custom command. This should be used wisely to add semantic meaning to otherwise confusing sequences of commands - not just speed up typing. (If you want suggestions for shortcuts you can ask Thayer).
+%Here is an example definition of a bra and ket from Quantum Mechanics.
+\newcommand{\bra}[1]{\langle #1 |}
+\newcommand{\ket}[1]{| #1 \rangle}
+\newcommand{\dmo}{\DeclareMathOperator}
+\dmo{\im}{Im }
+\dmo{\Poly}{Poly}
+\dmo{\Rat}{Rat}
+\dmo{\bd}{bd}
+\dmo{\R}{\mathbb R}
+\dmo{\Q}{\mathbb Q}
+\newcommand{\ra}{\rightarrow}
+\newcommand{\ep}{\epsilon}
+\newcommand{\de}{\delta}
+\dmo{\supp}{supp}
+
+
+%Adding your name here lets you make sure every page has your name, so that your psets don't get mixed up.
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\lhead{Wassim Marrakchi}
+\rhead{CS51: Final Project}
+
+%This changes removes indentation and instead adds space between paragraphs. I think it looks nicer this way. 
+\setlength{\parindent}{40 pt}
+\setlength{\parskip}{1.25ex}
+
+
+\begin{document}
+\maketitle
+\section{Introduction}
+For my final project, I implemented a small subset of an Ocaml-like language called MiniMl including only a subset of constructs and limited support for types without type inference. I implemented three models of MiniMl using the substitution model (eval\_s), a dynamically scoped environment model (eval\_d) and, finally, a lexically scoped environment model as my extension (eval\_l). The substitution model was lexically scoped. It "purely" handles all the initial subset of constructs we were given. However, the model is not good enough as it is impossible to extend the language to handle references, mutability and imperative programming. To remedy to that, we chose to make use of an environment to store mapping from variables to their values.
+\section{Lexically vs. Dynamically Scoped}
+\indent In a dynamic scope, the scope of a function's variable name is determined by the dynamic ordering in which they are evaluated. In a lexical scope, the values of variables are governed instead by the lexical structure of the program, allowing us to account for overrides. Consider:
+\[\text{let x = 1 in let f = fun y -$>$ x + y in let x = 2 in f 3 ;;}\]
+\par\indent In a dynamically scoped environment, when evaluation the application of f to $3$, we take x as $2$, the most recent assignment, instead of taking x as $1$ which is the x that outscopes the body of f. In this case, a dynamic scoped environment (eval\_d) would return $5$ while the right answer  $4$ is given by the lexically scoped environment (eval\_l).
+\section{Extension: Lexically Scoped Environment Semantics}
+To fix the dynamic semantics, it is important to handle to handle function values statements differently by packaging up the function being defined and a snapshot of the environment at the time of its definition into a closure so that, at evaluation time, we use the definition environment instead of the dynamic environment. To do that, I changed three parts of my dynamically scoped environment implementation: Fun, Letrec, and App.
+\par\indent In the case of Fun, as explained before, we want to keep track of both the function definition and the environment at the moment of definition. To do that, we added the construct Closure which only is only relevant to functions.
+\par\indent In the case of Letrec, we want to assign Unassighed to $id$ first so that we evaluate the definition independently from the $id$'s value. From there, we can replace all the Unassigned by the evaluated definition. 
+\par\indent App is certainly the more complicated case. We start by evaluating the function in the current environment so that it returns the closure of the function with the environment of its definition. We then evaluate the function again in an environment we extend by mapping the definition variable with the evaluation of what is passed to the function.
+\section{Conclusion}
+This project was very interesting as I learned a lot about scoping and the intricacies of interpreters. As I was trying the various abstraction techniques we've learned in the course, I realized how similar all these models were but also how important the differences are in deciding the behavior of my MiniML interepreter.
+\end{document}
