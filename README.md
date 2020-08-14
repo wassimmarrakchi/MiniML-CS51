@@ -8,7 +8,7 @@ In a dynamic scope, the scope of a function's variable name is determined by the
 
 ![equation](https://latex.codecogs.com/gif.latex?%5Ctext%7B%20let%20x%20%3D%201%20in%20let%20f%20%3D%20fun%20y%20-%24%3E%24%20x%20&plus;%20y%20in%20let%20x%20%3D%202%20in%20f%203%20%3B%3B%20%7D)
 
-In a dynamically scoped environment, when evaluation the application of f to 3, we take x as 2, the most recent assignment, instead of taking x as 1 which is the x that outscopes the body of f. In this case, a dynamic scoped environment (eval\_d) would return 5 while the right answer 4 is given by the lexically scoped environment (eval_l).
+In a dynamically scoped environment, when evaluating the application of f to 3, we take x as 2, the most recent assignment, instead of taking x as 1 which is the x that outscopes the body of f. In this case, a dynamic scoped environment (eval\_d) would return 5 while the right answer 4 is given by the lexically scoped environment (eval_l).
 
 ## Extension: Lexically Scoped Environment Semantics
 
